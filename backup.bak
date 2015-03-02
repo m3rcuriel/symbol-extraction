@@ -1,0 +1,50 @@
+    /*
+    cv::Mat temp_feat, img_feat;
+    cv::Mat input = cv::imread("template.png", CV_LOAD_IMAGE_GRAYSCALE);
+    cv::Mat temp = cv::imread("single.png", CV_LOAD_IMAGE_GRAYSCALE);
+
+    cv::DynamicAdaptedFeatureDetector detector (new cv::FastAdjuster(10, true), 5000, 10000, 10);
+    cv::SiftDescriptorExtractor extractor ( 3.0 );
+    std::vector<cv::KeyPoint> imgkeypoints;
+    std::vector<cv::KeyPoint> tempkeypoints;
+
+    detector.detect(input, imgkeypoints);
+    detector.detect(temp, tempkeypoints);
+
+    cv::drawKeypoints(input, imgkeypoints, img_feat);
+    cv::drawKeypoints(temp, tempkeypoints, temp_feat);
+
+    cv::imwrite("temp_feat.png", temp_feat);
+    cv::imwrite("img_feat.png", img_feat);
+
+    cv::Mat img_desc, temp_desc;
+    extractor.compute(input, imgkeypoints, img_desc);
+    extractor.compute(input, tempkeypoints, temp_desc);
+
+    std::vector<std::vector<cv::DMatch> > matches;
+
+    cv::Ptr<cv::DescriptorMatcher> matcher = cv::DescriptorMatcher::create("BruteForce");
+
+    matcher->knnMatch(img_desc, temp_desc, matches, 50);
+
+    //cv::findHomography(matches, matches, cv::RANSAC);
+
+    std::cout << matches.size() << std::endl;
+
+    cv::Mat result;
+
+    cv::drawMatches(input, imgkeypoints, temp, tempkeypoints, matches, result);
+
+    cv::imwrite("result.png", result);
+
+    cv::Mat final, result, mask;
+    cv::Mat src = cv::imread("Draft_150ppi.png", -1);
+    cv::Mat temp = cv::imread("template.png", 1);
+    cv::Mat split[3];
+    cv::split(temp, split);
+    split[0] = split[2], split[1] = split[2];
+    cv::merge(split, 3, temp);
+    cv::Mat img_template = transparentTemplate(cv::imread("template-200.png", 1));
+    cv::threshold(img_template, img_template, 180, 0, CV_THRESH_TOZERO);
+    cv::imwrite("clear.png", img_template);
+    src.copyTo(final);
